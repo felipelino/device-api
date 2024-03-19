@@ -56,13 +56,19 @@ public class DeviceController {
     }
 
     @PostMapping(path = "/api/device/{id}")
-    public ResponseEntity<DeviceResponse> updateDevice(@PathVariable(name = "id", required = true) Long id) {
-        return null;
+    public ResponseEntity<DeviceResponse> updateDevice(@PathVariable(name = "id", required = true) Long id, @RequestBody DeviceRequest deviceRequest) {
+        DeviceResponse deviceResponse = this.deviceService.updateDevice(id, deviceRequest);
+        if(deviceResponse == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(deviceResponse);
     }
 
     @DeleteMapping(path = "/api/device/{id}")
     public ResponseEntity deleteDevice(@PathVariable(name = "id", required = true) Long id) {
-        return null;
+        this.deviceService.deleteDevice(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

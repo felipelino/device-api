@@ -14,4 +14,8 @@ public interface DeviceService
     DeviceResponse saveDevice(DeviceRequest deviceRequest);
 
     DeviceResponse replaceDevice(Long id, DeviceRequest deviceRequest);
+
+    DeviceResponse updateDevice(Long id, DeviceRequest deviceRequest);
+
+    void deleteDevice(Long id);
 }

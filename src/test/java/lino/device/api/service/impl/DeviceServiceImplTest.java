@@ -8,13 +8,13 @@ import lino.device.api.repository.model.Device;
 import lino.device.api.service.DeviceService;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class DeviceServiceImplTest {
 
@@ -189,5 +189,38 @@ public class DeviceServiceImplTest {
         Assert.assertEquals(device1.getBrand(), deviceResponse.getBrand());
         Assert.assertEquals(device1.getId(), deviceResponse.getId());
         Assert.assertEquals(device1.getCreationTime(), deviceResponse.getCreationTime());
+    }
+
+    @Test
+    public void updateDevice_success() throws Exception {
+
+        // Prepare
+        Device device1 = new Device();
+        device1.setId(1l);
+        device1.setName("MyCustomName");
+        device1.setBrand("MyCustomBrand");
+        device1.setCreationTime(1710849243328l); // hard coded date - should not be updated 2023-03-19 11:54
+        when((this.deviceRepositoryMock.findById(anyLong()))).thenReturn(Optional.of(device1));
+        when(this.deviceRepositoryMock.save(any(Device.class))).thenReturn(device1);
+
+        DeviceResponse deviceResponse = this.deviceService.updateDevice(device1.getId(), new DeviceRequest());
+
+        // Assert
+        Assert.assertNotNull(deviceResponse);
+        Assert.assertEquals(device1.getName(), deviceResponse.getName());
+        Assert.assertEquals(device1.getBrand(), deviceResponse.getBrand());
+        Assert.assertEquals(device1.getId(), deviceResponse.getId());
+        Assert.assertEquals(device1.getCreationTime(), deviceResponse.getCreationTime());
+    }
+
+    @Test
+    public void deleteDevice_success() throws Exception {
+
+        // Execute
+        this.deviceService.deleteDevice(99l);
+
+        // Assert
+        verify(this.deviceRepositoryMock, Mockito.times(1)).deleteById(eq(99l));
+        verifyNoInteractions(this.deviceRepositoryMock);
     }
 }

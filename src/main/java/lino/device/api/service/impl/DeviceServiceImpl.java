@@ -5,6 +5,7 @@ import lino.device.api.dto.DeviceResponse;
 import lino.device.api.repository.model.Device;
 import lino.device.api.service.DeviceService;
 import lino.device.api.repository.DeviceRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -61,6 +62,24 @@ public class DeviceServiceImpl implements DeviceService {
             return toDeviceResponse(device);
         }
         return null;
+    }
+
+    @Override
+    public DeviceResponse updateDevice(Long id, DeviceRequest deviceRequest) {
+        Optional<Device> optional = this.deviceRepository.findById(id);
+        if(optional.isPresent()) {
+            Device device = optional.get();
+            device.setBrand(StringUtils.isEmpty(deviceRequest.getBrand()) ? device.getBrand() : deviceRequest.getBrand());
+            device.setName(StringUtils.isEmpty(deviceRequest.getName()) ? device.getName() : deviceRequest.getName());
+            device = this.deviceRepository.save(device);
+            return toDeviceResponse(device);
+        }
+        return null;
+    }
+
+    @Override
+    public void deleteDevice(Long id) {
+        this.deviceRepository.deleteById(id);
     }
 
     protected static Device toDevice(DeviceRequest deviceRequest) {

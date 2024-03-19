@@ -199,4 +199,112 @@ public class DeviceControllerTest {
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
                 .andReturn();
     }
+
+    @Test
+    public void updateDevice_whenNotExists() throws Exception {
+        // Prepare
+        DeviceRequest deviceRequest = new DeviceRequest();
+        deviceRequest.setName("changed name");
+        deviceRequest.setBrand("changed brand");
+
+        String jsonRequest = this.objectMapper.writeValueAsString(deviceRequest);
+
+        // Execute and Assert
+        MvcResult result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/device/99")
+                        .content(jsonRequest)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                .andReturn();
+    }
+
+    @Test
+    public void updateDevice_whenExistsChangeName() throws Exception {
+        // Prepare
+        Device device = new Device();
+        device.setName("device name");
+        device.setBrand("device brand");
+        device.setCreationTime(1710849243328l); // hard coded date - should not be updated 2023-03-19 11:54
+        device = this.deviceRepository.save(device);
+
+        DeviceRequest deviceRequest = new DeviceRequest();
+        deviceRequest.setName("changed name");
+
+        String jsonRequest = this.objectMapper.writeValueAsString(deviceRequest);
+
+        // Execute and Assert
+        MvcResult result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/device/"+device.getId())
+                        .content(jsonRequest)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andReturn();
+
+        String json = result.getResponse().getContentAsString();
+        Assert.assertNotNull(json);
+        DeviceResponse deviceResponse = this.objectMapper.readValue(json, DeviceResponse.class);
+        Assert.assertEquals(device.getId(), deviceResponse.getId());
+        Assert.assertEquals(device.getCreationTime(), deviceResponse.getCreationTime()); // not changed
+        Assert.assertEquals(deviceRequest.getName(), deviceResponse.getName());
+        Assert.assertEquals(device.getBrand(), deviceResponse.getBrand()); // Not changed
+    }
+
+    @Test
+    public void updateDevice_whenExistsChangeBrand() throws Exception {
+        // Prepare
+        Device device = new Device();
+        device.setName("device name");
+        device.setBrand("device brand");
+        device.setCreationTime(1710849243328l); // hard coded date - should not be updated 2023-03-19 11:54
+        device = this.deviceRepository.save(device);
+
+        DeviceRequest deviceRequest = new DeviceRequest();
+        deviceRequest.setBrand("changed brand");
+
+        String jsonRequest = this.objectMapper.writeValueAsString(deviceRequest);
+
+        // Execute and Assert
+        MvcResult result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/device/"+device.getId())
+                        .content(jsonRequest)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andReturn();
+
+        String json = result.getResponse().getContentAsString();
+        Assert.assertNotNull(json);
+        DeviceResponse deviceResponse = this.objectMapper.readValue(json, DeviceResponse.class);
+        Assert.assertEquals(device.getId(), deviceResponse.getId());
+        Assert.assertEquals(device.getCreationTime(), deviceResponse.getCreationTime()); // not changed
+        Assert.assertEquals(device.getName(), deviceResponse.getName()); // Not changed
+        Assert.assertEquals(deviceRequest.getBrand(), deviceResponse.getBrand());
+    }
+
+
+    @Test
+    public void deleteDevice_success() throws Exception {
+        // Prepare
+        Device device = new Device();
+        device.setName("device name");
+        device.setBrand("device brand");
+        device.setCreationTime(1710849243328l); // hard coded date - should not be updated 2023-03-19 11:54
+        device = this.deviceRepository.save(device);
+
+        // Execute and Assert
+        MvcResult result = this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/device/"+device.getId()))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.NO_CONTENT.value()))
+                .andReturn();
+    }
+
+    @Test
+    public void deleteDevice_notExists_success() throws Exception {
+        // Execute and Assert
+        MvcResult result = this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/device/"+99))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.NO_CONTENT.value()))
+                .andReturn();
+    }
+
+
 }
