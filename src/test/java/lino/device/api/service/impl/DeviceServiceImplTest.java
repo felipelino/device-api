@@ -104,6 +104,8 @@ public class DeviceServiceImplTest {
         Assert.assertEquals(device1.getBrand(), deviceResponse.getBrand());
         Assert.assertEquals(device1.getId(), deviceResponse.getId());
         Assert.assertEquals(device1.getCreationTime(), deviceResponse.getCreationTime());
+        verify(this.deviceRepositoryMock, Mockito.times(1)).findAll();
+        verifyNoMoreInteractions(this.deviceRepositoryMock);
     }
 
     @Test
@@ -118,6 +120,8 @@ public class DeviceServiceImplTest {
         // Assert
         Assert.assertNotNull(deviceResponseList);
         Assert.assertEquals(0, deviceResponseList.size());
+        verify(this.deviceRepositoryMock, Mockito.times(1)).findAll();
+        verifyNoMoreInteractions(this.deviceRepositoryMock);
     }
 
     @Test
@@ -132,6 +136,8 @@ public class DeviceServiceImplTest {
 
         // Assert
         Assert.assertNull(deviceResponse);
+        verify(this.deviceRepositoryMock, Mockito.times(1)).findById(eq(99l));
+        verifyNoMoreInteractions(this.deviceRepositoryMock);
     }
 
     @Test
@@ -146,6 +152,8 @@ public class DeviceServiceImplTest {
 
         // Assert
         Assert.assertNotNull(deviceResponse);
+        verify(this.deviceRepositoryMock, Mockito.times(1)).findById(eq(99l));
+        verifyNoMoreInteractions(this.deviceRepositoryMock);
     }
 
     @Test
@@ -167,6 +175,8 @@ public class DeviceServiceImplTest {
         Assert.assertEquals(device1.getBrand(), deviceResponse.getBrand());
         Assert.assertEquals(device1.getId(), deviceResponse.getId());
         Assert.assertEquals(device1.getCreationTime(), deviceResponse.getCreationTime());
+        verify(this.deviceRepositoryMock, Mockito.times(1)).save(any(Device.class));
+        verifyNoMoreInteractions(this.deviceRepositoryMock);
     }
 
     @Test
@@ -189,6 +199,9 @@ public class DeviceServiceImplTest {
         Assert.assertEquals(device1.getBrand(), deviceResponse.getBrand());
         Assert.assertEquals(device1.getId(), deviceResponse.getId());
         Assert.assertEquals(device1.getCreationTime(), deviceResponse.getCreationTime());
+        verify(this.deviceRepositoryMock, Mockito.times(1)).findById(eq(device1.getId()));
+        verify(this.deviceRepositoryMock, Mockito.times(1)).save(any(Device.class));
+        verifyNoMoreInteractions(this.deviceRepositoryMock);
     }
 
     @Test
@@ -211,6 +224,9 @@ public class DeviceServiceImplTest {
         Assert.assertEquals(device1.getBrand(), deviceResponse.getBrand());
         Assert.assertEquals(device1.getId(), deviceResponse.getId());
         Assert.assertEquals(device1.getCreationTime(), deviceResponse.getCreationTime());
+        verify(this.deviceRepositoryMock, Mockito.times(1)).findById(eq(device1.getId()));
+        verify(this.deviceRepositoryMock, Mockito.times(1)).save(any(Device.class));
+        verifyNoMoreInteractions(this.deviceRepositoryMock);
     }
 
     @Test
@@ -221,6 +237,6 @@ public class DeviceServiceImplTest {
 
         // Assert
         verify(this.deviceRepositoryMock, Mockito.times(1)).deleteById(eq(99l));
-        verifyNoInteractions(this.deviceRepositoryMock);
+        verifyNoMoreInteractions(this.deviceRepositoryMock);
     }
 }

@@ -25,15 +25,19 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
+    public List<DeviceResponse> getAllDevices(String brand) {
+        if(StringUtils.isBlank(brand)) {
+            return getAllDevices();
+        }
+
+        Iterable<Device> devices = this.deviceRepository.findByBrand(brand);
+        return toDeviceList(devices);
+    }
+
+    @Override
     public List<DeviceResponse> getAllDevices() {
-       Iterable<Device> devices = this.deviceRepository.findAll();
-       List<DeviceResponse> deviceResponseList = new ArrayList<>();
-       if(devices != null) {
-           for(Device device : devices) {
-               deviceResponseList.add(toDeviceResponse(device));
-           }
-       }
-       return deviceResponseList;
+        Iterable<Device> devices = this.deviceRepository.findAll();
+        return toDeviceList(devices);
     }
 
     @Override
@@ -80,6 +84,16 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public void deleteDevice(Long id) {
         this.deviceRepository.deleteById(id);
+    }
+
+    private static List<DeviceResponse> toDeviceList(Iterable<Device> devices) {
+        List<DeviceResponse> deviceResponseList = new ArrayList<>();
+        if(devices != null) {
+            for(Device device : devices) {
+                deviceResponseList.add(toDeviceResponse(device));
+            }
+        }
+        return deviceResponseList;
     }
 
     protected static Device toDevice(DeviceRequest deviceRequest) {

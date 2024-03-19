@@ -81,6 +81,23 @@ public class DeviceControllerTest {
     }
 
     @Test
+    public void getAllDevicesByBrand_databaseNotEmpty() throws Exception {
+
+        // Execute and Assert
+        Device device = defaultDevicesInDatabase.get(1);
+        MvcResult result = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/device?brand="+device.getBrand()))
+                .andExpect(status().is2xxSuccessful())
+                .andReturn();
+
+        String json = result.getResponse().getContentAsString();
+        Assert.assertNotNull(json);
+
+        List<DeviceResponse> deviceList = this.objectMapper.readValue(json, new TypeReference<List<DeviceResponse>>(){});
+        Assert.assertEquals(1, deviceList.size());
+        Assert.assertEquals(1, deviceList.stream().filter(deviceResponse -> deviceResponse.getName().equals(device.getName())).count());
+    }
+
+    @Test
     public void getAllDevices_databaseIsEmpty() throws Exception {
         // Prepare
         this.deviceRepository.deleteAll();

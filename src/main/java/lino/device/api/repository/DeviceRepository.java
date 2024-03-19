@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface DeviceRepository extends CrudRepository<Device, Long> {
-    Optional<Device> findByBrand(String brand);
+    Iterable<Device> findByBrand(String brand);
 }

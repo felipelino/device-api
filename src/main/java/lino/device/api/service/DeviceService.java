@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface DeviceService
 {
+    List<DeviceResponse> getAllDevices(String brand);
+
     List<DeviceResponse> getAllDevices();
 
     DeviceResponse getDeviceById(Long id);

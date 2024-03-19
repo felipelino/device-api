@@ -21,8 +21,8 @@ public class DeviceController {
     }
 
     @GetMapping(path = "/api/device")
-    public ResponseEntity<List<DeviceResponse>> getAllDevices() {
-        List<DeviceResponse> deviceResponses = this.deviceService.getAllDevices();
+    public ResponseEntity<List<DeviceResponse>> getAllDevices(@RequestParam( name = "brand", required = false) String brand) {
+        List<DeviceResponse> deviceResponses = this.deviceService.getAllDevices(brand);
         return ResponseEntity.ok(deviceResponses);
     }
 

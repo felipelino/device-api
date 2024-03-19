@@ -29,12 +29,13 @@ public class DeviceRepositoryTest {
         deviceRepository.save(device);
 
         // Execute
-        Optional<Device> optional = deviceRepository.findByBrand(device.getBrand());
+        Iterable<Device> devices = deviceRepository.findByBrand(device.getBrand());
 
         // Assert
-        Assert.assertNotNull(optional);
-        Assert.assertTrue(optional.isPresent());
-        Assert.assertEquals(device , optional.get());
+        Assert.assertNotNull(devices);
+        for(Device d : devices) {
+            Assert.assertEquals(device , d);
+        }
     }
 
     @Test
@@ -44,10 +45,14 @@ public class DeviceRepositoryTest {
         deviceRepository.deleteAll();
 
         // Execute
-        Optional<Device> optional = deviceRepository.findByBrand("notExistBrand");
+        Iterable<Device> devices = deviceRepository.findByBrand("notExistBrand");
 
         // Assert
-        Assert.assertNotNull(optional);
-        Assert.assertTrue(optional.isEmpty());
+        Assert.assertNotNull(devices);
+        int count = 0;
+        for(Device d : devices) {
+            count++;
+        }
+        Assert.assertEquals(0, count);
     }
 }
