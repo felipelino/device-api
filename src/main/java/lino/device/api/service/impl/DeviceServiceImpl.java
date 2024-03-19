@@ -45,9 +45,22 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public DeviceResponse createDevice(DeviceRequest deviceRequest) {
+    public DeviceResponse saveDevice(DeviceRequest deviceRequest) {
         Device device = this.deviceRepository.save(toDevice(deviceRequest));
         return toDeviceResponse(device);
+    }
+
+    @Override
+    public DeviceResponse replaceDevice(Long id, DeviceRequest deviceRequest) {
+        Optional<Device> optional = this.deviceRepository.findById(id);
+        if(optional.isPresent()) {
+            Device device = optional.get();
+            device.setBrand(deviceRequest.getBrand());
+            device.setName(deviceRequest.getName());
+            device = this.deviceRepository.save(device);
+            return toDeviceResponse(device);
+        }
+        return null;
     }
 
     protected static Device toDevice(DeviceRequest deviceRequest) {

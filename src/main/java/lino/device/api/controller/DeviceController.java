@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -39,7 +38,7 @@ public class DeviceController {
 
     @PostMapping(path = "/api/device")
     public ResponseEntity<DeviceResponse> createDevice(@RequestBody DeviceRequest deviceRequest) {
-        DeviceResponse deviceResponse = this.deviceService.createDevice(deviceRequest);
+        DeviceResponse deviceResponse = this.deviceService.saveDevice(deviceRequest);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(deviceResponse.getId()).toUri();
@@ -47,11 +46,16 @@ public class DeviceController {
     }
 
     @PutMapping(path = "/api/device/{id}")
-    public ResponseEntity<DeviceResponse> replaceDevice(@PathVariable(name = "id", required = true) Long id) {
-        return null;
+    public ResponseEntity<DeviceResponse> replaceDevice(@PathVariable(name = "id", required = true) Long id, @RequestBody DeviceRequest deviceRequest) {
+        DeviceResponse deviceResponse = this.deviceService.replaceDevice(id, deviceRequest);
+        if(deviceResponse == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(deviceResponse);
     }
 
-    @PatchMapping(path = "/api/device/{id}")
+    @PostMapping(path = "/api/device/{id}")
     public ResponseEntity<DeviceResponse> updateDevice(@PathVariable(name = "id", required = true) Long id) {
         return null;
     }

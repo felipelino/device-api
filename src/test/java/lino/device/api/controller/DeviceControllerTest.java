@@ -148,4 +148,55 @@ public class DeviceControllerTest {
         Assert.assertEquals(deviceRequest.getName(), deviceResponse.getName());
         Assert.assertEquals(deviceRequest.getBrand(), deviceResponse.getBrand());
     }
+
+    @Test
+    public void replaceDevice_whenExists() throws Exception {
+
+        Device device = new Device();
+        device.setName("device name");
+        device.setBrand("device brand");;
+        device.setCreationTime(1710849243328l); // hard coded date - should not be updated 2023-03-19 11:54
+        device = this.deviceRepository.save(device);
+
+        DeviceRequest deviceRequest = new DeviceRequest();
+        deviceRequest.setName("changed name");
+        deviceRequest.setBrand("changed brand");
+
+        String jsonRequest = this.objectMapper.writeValueAsString(deviceRequest);
+
+        // Execute and Assert
+        MvcResult result = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/device/"+device.getId())
+                        .content(jsonRequest)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        String json = result.getResponse().getContentAsString();
+        Assert.assertNotNull(json);
+        DeviceResponse deviceResponse = this.objectMapper.readValue(json, DeviceResponse.class);
+        Assert.assertEquals(device.getId(), deviceResponse.getId());
+        Assert.assertEquals(device.getCreationTime(), deviceResponse.getCreationTime());
+        Assert.assertEquals(deviceRequest.getName(), deviceResponse.getName());
+        Assert.assertEquals(deviceRequest.getBrand(), deviceResponse.getBrand());
+    }
+
+    @Test
+    public void replaceDevice_whenNotExists() throws Exception {
+        // Prepare
+        DeviceRequest deviceRequest = new DeviceRequest();
+        deviceRequest.setName("changed name");
+        deviceRequest.setBrand("changed brand");
+
+        String jsonRequest = this.objectMapper.writeValueAsString(deviceRequest);
+
+        // Execute and Assert
+        MvcResult result = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/device/99")
+                        .content(jsonRequest)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                .andReturn();
+    }
 }

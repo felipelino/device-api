@@ -159,7 +159,7 @@ public class DeviceServiceImplTest {
         when(this.deviceRepositoryMock.save(any(Device.class))).thenReturn(device1);
 
         // Execute
-        DeviceResponse deviceResponse = this.deviceService.createDevice(new DeviceRequest());
+        DeviceResponse deviceResponse = this.deviceService.saveDevice(new DeviceRequest());
 
         // Assert
         Assert.assertNotNull(deviceResponse);
@@ -169,4 +169,25 @@ public class DeviceServiceImplTest {
         Assert.assertEquals(device1.getCreationTime(), deviceResponse.getCreationTime());
     }
 
+    @Test
+    public void replaceDevice_success() throws Exception {
+
+        // Prepare
+        Device device1 = new Device();
+        device1.setId(1l);
+        device1.setName("MyCustomName");
+        device1.setBrand("MyCustomBrand");
+        device1.setCreationTime(1710849243328l); // hard coded date - should not be updated 2023-03-19 11:54
+        when((this.deviceRepositoryMock.findById(anyLong()))).thenReturn(Optional.of(device1));
+        when(this.deviceRepositoryMock.save(any(Device.class))).thenReturn(device1);
+
+        DeviceResponse deviceResponse = this.deviceService.replaceDevice(device1.getId(), new DeviceRequest());
+
+        // Assert
+        Assert.assertNotNull(deviceResponse);
+        Assert.assertEquals(device1.getName(), deviceResponse.getName());
+        Assert.assertEquals(device1.getBrand(), deviceResponse.getBrand());
+        Assert.assertEquals(device1.getId(), deviceResponse.getId());
+        Assert.assertEquals(device1.getCreationTime(), deviceResponse.getCreationTime());
+    }
 }

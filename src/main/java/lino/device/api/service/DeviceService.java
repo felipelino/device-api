@@ -11,5 +11,7 @@ public interface DeviceService
 
     DeviceResponse getDeviceById(Long id);
 
-    DeviceResponse createDevice(DeviceRequest deviceRequest);
+    DeviceResponse saveDevice(DeviceRequest deviceRequest);
+
+    DeviceResponse replaceDevice(Long id, DeviceRequest deviceRequest);
 }
