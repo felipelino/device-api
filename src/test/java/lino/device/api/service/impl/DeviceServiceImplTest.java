@@ -1,6 +1,7 @@
 package lino.device.api.service.impl;
 
 
+import lino.device.api.dto.DeviceRequest;
 import lino.device.api.dto.DeviceResponse;
 import lino.device.api.repository.DeviceRepository;
 import lino.device.api.repository.model.Device;
@@ -10,6 +11,7 @@ import org.junit.Test;
 
 import java.util.*;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -37,7 +39,35 @@ public class DeviceServiceImplTest {
         Assert.assertEquals(device1.getBrand(), deviceResponse.getBrand());
         Assert.assertEquals(device1.getId(), deviceResponse.getId());
         Assert.assertEquals(device1.getCreationTime(), deviceResponse.getCreationTime());
+    }
 
+    @Test
+    public void toDevice_success() {
+        // Prepare
+        DeviceRequest deviceRequest = new DeviceRequest();
+        deviceRequest.setName("MyCustomName");
+        deviceRequest.setBrand("MyCustomBrand");
+
+        // Execute
+        Device device = DeviceServiceImpl.toDevice(deviceRequest);
+
+        // Assert
+        Assert.assertNotNull(device);
+        Assert.assertEquals(deviceRequest.getName(), device.getName());
+        Assert.assertEquals(deviceRequest.getBrand(), device.getBrand());
+        Assert.assertNull(device.getId());
+        Assert.assertNotNull(device.getCreationTime());
+    }
+
+    @Test
+    public void toDevice_whenInputIsNull() {
+        // Prepare
+
+        // Execute
+        Device device = DeviceServiceImpl.toDevice(null);
+
+        // Assert
+        Assert.assertNull(device);
     }
 
     @Test
@@ -116,6 +146,27 @@ public class DeviceServiceImplTest {
 
         // Assert
         Assert.assertNotNull(deviceResponse);
+    }
+
+    @Test
+    public void createDevice_success() throws Exception {
+        // Prepare
+        Device device1 = new Device();
+        device1.setId(1l);
+        device1.setName("MyCustomName");
+        device1.setBrand("MyCustomBrand");
+        device1.setCreationTime(new Date().getTime());
+        when(this.deviceRepositoryMock.save(any(Device.class))).thenReturn(device1);
+
+        // Execute
+        DeviceResponse deviceResponse = this.deviceService.createDevice(new DeviceRequest());
+
+        // Assert
+        Assert.assertNotNull(deviceResponse);
+        Assert.assertEquals(device1.getName(), deviceResponse.getName());
+        Assert.assertEquals(device1.getBrand(), deviceResponse.getBrand());
+        Assert.assertEquals(device1.getId(), deviceResponse.getId());
+        Assert.assertEquals(device1.getCreationTime(), deviceResponse.getCreationTime());
     }
 
 }

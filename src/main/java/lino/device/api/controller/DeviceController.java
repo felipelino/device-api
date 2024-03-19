@@ -6,7 +6,9 @@ import lino.device.api.service.DeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +39,11 @@ public class DeviceController {
 
     @PostMapping(path = "/api/device")
     public ResponseEntity<DeviceResponse> createDevice(@RequestBody DeviceRequest deviceRequest) {
-        return null;
+        DeviceResponse deviceResponse = this.deviceService.createDevice(deviceRequest);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(deviceResponse.getId()).toUri();
+        return ResponseEntity.created(location).body(deviceResponse);
     }
 
     @PutMapping(path = "/api/device/{id}")

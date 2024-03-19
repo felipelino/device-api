@@ -1,5 +1,6 @@
 package lino.device.api.service.impl;
 
+import lino.device.api.dto.DeviceRequest;
 import lino.device.api.dto.DeviceResponse;
 import lino.device.api.repository.model.Device;
 import lino.device.api.service.DeviceService;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,6 +42,23 @@ public class DeviceServiceImpl implements DeviceService {
             return toDeviceResponse(optional.get());
         }
         return null;
+    }
+
+    @Override
+    public DeviceResponse createDevice(DeviceRequest deviceRequest) {
+        Device device = this.deviceRepository.save(toDevice(deviceRequest));
+        return toDeviceResponse(device);
+    }
+
+    protected static Device toDevice(DeviceRequest deviceRequest) {
+        if(deviceRequest == null) {
+            return null;
+        }
+        Device device = new Device();
+        device.setBrand(deviceRequest.getBrand());
+        device.setName(deviceRequest.getName());
+        device.setCreationTime(new Date().getTime());
+        return device;
     }
 
     protected static DeviceResponse toDeviceResponse(Device device) {

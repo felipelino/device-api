@@ -14,6 +14,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -23,6 +25,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -116,5 +120,32 @@ public class DeviceControllerTest {
         Assert.assertEquals(device.getBrand(), deviceResponse.getBrand());
         Assert.assertEquals(device.getName(), deviceResponse.getName());
         Assert.assertEquals(device.getCreationTime(), deviceResponse.getCreationTime());
+    }
+
+    @Test
+    public void createDevice_success() throws Exception {
+        // Prepare
+        DeviceRequest deviceRequest = new DeviceRequest();
+        deviceRequest.setName("DeviceName");
+        deviceRequest.setBrand("DeviceBrand");
+
+        String jsonRequest = this.objectMapper.writeValueAsString(deviceRequest);
+
+        // Execute and Assert
+        MvcResult result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/device")
+                        .content(jsonRequest)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.CREATED.value()))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        String json = result.getResponse().getContentAsString();
+        Assert.assertNotNull(json);
+        DeviceResponse deviceResponse = this.objectMapper.readValue(json, DeviceResponse.class);
+        Assert.assertNotNull(deviceResponse.getId());
+        Assert.assertNotNull(deviceResponse.getCreationTime());
+        Assert.assertEquals(deviceRequest.getName(), deviceResponse.getName());
+        Assert.assertEquals(deviceRequest.getBrand(), deviceResponse.getBrand());
     }
 }
